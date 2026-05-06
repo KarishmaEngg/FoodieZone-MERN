@@ -21,7 +21,7 @@ app.use(limiter); // ✅ Apply rate limiter globally
 
 // ✅ CORS configuration
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["https://foodie-zone-mern.vercel.app/"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
