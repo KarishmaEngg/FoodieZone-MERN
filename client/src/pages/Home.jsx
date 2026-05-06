@@ -30,18 +30,18 @@ const Home = () => {
   const handleCategoryClick = (categoryName) => {
     navigate('/menu', { state: { category: categoryName } });
   };
-
-  useEffect(() => {
-    const fetchFeedbacks = async () => {
-      try {
-        const res = await axios.get('/feedback');
-        setFeedbacks(res.data);
-      } catch (err) {
-        console.error("Error fetching feedbacks", err);
-      }
-    };
-    fetchFeedbacks();
-  }, []);
+useEffect(() => {
+  const fetchFeedbacks = async () => {
+    try {
+      const res = await axios.get('/feedback');
+      console.log("Fetched feedbacks:", res.data); // 🔎 log to check
+      setFeedbacks(res.data);
+    } catch (err) {
+      console.error("Error fetching feedbacks", err);
+    }
+  };
+  fetchFeedbacks();
+}, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">

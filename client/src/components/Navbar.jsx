@@ -1,81 +1,137 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ShoppingCart, Flame, UtensilsCrossed, LogIn, UserPlus } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const linkClasses = ({ isActive }) =>
-    isActive
-      ? "text-white bg-blue-600 px-3 py-2 rounded-md font-semibold"
-      : "text-gray-200 hover:text-white px-3 py-2 rounded-md";
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Menu", path: "/menu", icon: <UtensilsCrossed size={16} /> },
+    { name: "Popular", path: "/popular", icon: <Flame size={16} /> },
+    { name: "Cart", path: "/cart", icon: <ShoppingCart size={16} /> },
+    { name: "Feedback", path: "/feedback" },
+  ];
 
   return (
-    <nav className="bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-white font-bold text-xl">
-              FoodieZone
+    <>
+      {/* 1. Actual Navbar */}
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all duration-300 h-16 flex items-center ${
+          scrolled 
+            ? "bg-white/90 backdrop-blur-md shadow-md" 
+            : "bg-gradient-to-r from-blue-600 to-purple-700"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="flex items-center justify-between">
+            
+            {/* Logo */}
+            <Link to="/" className={`font-bold text-xl flex items-center gap-2 ${scrolled ? "text-blue-600" : "text-white"}`}>
+              <span className="text-2xl">🍔</span>
+              <span className="tracking-tight font-black">FoodieZone</span>
             </Link>
-          </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <NavLink to="/" className={linkClasses}>Home</NavLink>
-              <NavLink to="/menu" className={linkClasses}>Menu</NavLink>
-              <NavLink to="/popular" className={linkClasses}>Popular</NavLink>
-              <NavLink to="/cart" className={linkClasses}>Cart</NavLink>
-              <NavLink to="/signin" className={linkClasses}>Sign In</NavLink>
-              <NavLink to="/signup" className={linkClasses}>Sign Up</NavLink>
-              <NavLink to="/feedback" className={linkClasses}>Feedback</NavLink>
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-1">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.name}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `px-3 py-1.5 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${
+                      isActive
+                        ? scrolled ? "bg-blue-600 text-white" : "bg-white text-blue-600"
+                        : scrolled ? "text-gray-600 hover:bg-gray-100" : "text-gray-100 hover:bg-white/20"
+                    }`
+                  }
+                >
+                  {link.icon}
+                  {link.name}
+                </NavLink>
+              ))}
+
+              <div className="flex items-center gap-2 ml-4">
+                <Link to="/signin" className={`text-sm font-bold px-4 py-1.5 rounded-full transition-all ${scrolled ? "text-blue-600 border border-blue-600 hover:bg-blue-50" : "text-white border border-white/50 hover:bg-white/10"}`}>
+                  Sign In
+                </Link>
+                <Link to="/signup" className="bg-orange-500 text-white text-sm font-bold px-4 py-1.5 rounded-full hover:bg-orange-600 shadow-sm transition-all">
+                  Sign Up
+                </Link>
+              </div>
+            </div>
+
+            {/* Mobile Button */}
+            <div className="md:hidden">
+              <button 
+                onClick={() => setIsOpen(!isOpen)} 
+                className={`p-1 rounded-lg focus:outline-none ${scrolled ? "text-blue-600" : "text-white"}`}
+              >
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={toggleMenu}
-              className="text-gray-200 hover:text-white focus:outline-none focus:text-white"
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="absolute top-16 left-0 w-full bg-white shadow-2xl border-t border-gray-100 md:hidden flex flex-col overflow-hidden"
             >
-              <svg
-                className="h-6 w-6 fill-current"
-                viewBox="0 0 24 24"
-              >
-                {isOpen ? (
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M18.3 5.71L12 12.01 5.71 5.71 4.29 7.12 10.59 13.41 4.29 19.71 5.71 21.12 12 14.83 18.3 21.12 19.71 19.71 13.41 13.41 19.71 7.12z"
-                  />
-                ) : (
-                  <path
-                    fillRule="evenodd"
-                    d="M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h16v2H4v-2z"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+              <div className="p-4 space-y-1">
+                {navLinks.map((link) => (
+                  <Link 
+                    key={link.name} 
+                    to={link.path} 
+                    onClick={() => setIsOpen(false)} 
+                    className="px-4 py-3 text-gray-700 hover:bg-blue-50 rounded-xl flex items-center gap-3 font-medium transition-colors"
+                  >
+                    <span className="text-blue-500">{link.icon}</span> 
+                    {link.name}
+                  </Link>
+                ))}
+                
+                {/* Divider Line */}
+                <div className="my-2 border-t border-gray-100"></div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 bg-blue-500">
-          <NavLink to="/" className={linkClasses} onClick={toggleMenu}>Home</NavLink>
-          <NavLink to="/menu" className={linkClasses} onClick={toggleMenu}>Menu</NavLink>
-          <NavLink to="/popular" className={linkClasses} onClick={toggleMenu}>Popular</NavLink>
-          <NavLink to="/cart" className={linkClasses} onClick={toggleMenu}>Cart</NavLink>
-          <NavLink to="/signin" className={linkClasses} onClick={toggleMenu}>Sign In</NavLink>
-          <NavLink to="/signup" className={linkClasses} onClick={toggleMenu}>Sign Up</NavLink>
-          <NavLink to="/feedback" className={linkClasses} onClick={toggleMenu}>Feedback</NavLink>
-        </div>
-      )}
-    </nav>
+                {/* Mobile Auth Buttons */}
+                <div className="grid grid-cols-2 gap-3 p-2">
+                  <Link 
+                    to="/signin" 
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 text-gray-800 rounded-xl font-bold text-sm hover:bg-gray-200"
+                  >
+                    <LogIn size={16} /> Sign In
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-3 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 shadow-md"
+                  >
+                    <UserPlus size={16} /> Sign Up
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {/* 2. Spacer */}
+      <div className="h-16"></div> 
+    </>
   );
 };
 
