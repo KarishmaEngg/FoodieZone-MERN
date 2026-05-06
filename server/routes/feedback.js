@@ -1,5 +1,5 @@
 import express from 'express';
-import Feedback from '../models/feedback.js';
+import Feedback from '../models/Feedback.js';
 
 const router = express.Router();
 
