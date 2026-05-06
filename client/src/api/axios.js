@@ -1,6 +1,6 @@
 import axios from 'axios';
 
 export default axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://foodie-backend-0z3c.onrender.com/api",
   withCredentials: true
 });
